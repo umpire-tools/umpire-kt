@@ -2,7 +2,7 @@ import java.net.URI
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm")
+    kotlin("multiplatform")
     kotlin("plugin.serialization")
 }
 
@@ -65,9 +65,55 @@ val extractConformanceFixtures by tasks.registering(Copy::class) {
     includeEmptyDirs = false
 }
 
+// ---------------------------------------------------------------------------
+// Kotlin Multiplatform
+// ---------------------------------------------------------------------------
+
+kotlin {
+    jvm()
+
+    jvmToolchain(17)
+
+    // Future targets — add as needed:
+    // ios()
+    // js { browser() }
+    // wasmJs()
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+            }
+        }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+
+        val jvmTest by getting {
+            dependsOn(commonTest)
+            dependencies {
+                implementation("io.kotest:kotest-runner-junit5:5.9.1")
+                implementation("io.kotest:kotest-assertions-core:5.9.1")
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// JVM test wiring
+// ---------------------------------------------------------------------------
+
 tasks.withType<Test> {
     dependsOn(extractConformanceFixtures)
     systemProperty("umpire.conformance.dir", conformanceOut.get().asFile.absolutePath)
+}
+
+tasks.named<Test>("jvmTest") {
+    useJUnitPlatform()
 }
 
 // ---------------------------------------------------------------------------
@@ -76,20 +122,4 @@ tasks.withType<Test> {
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-
-    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
-    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-kotlin {
-    jvmToolchain(17)
 }
