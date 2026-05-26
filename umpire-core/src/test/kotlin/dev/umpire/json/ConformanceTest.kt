@@ -10,17 +10,18 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 /**
- * Drives the @umpire/json conformance fixtures against the Kotlin implementation.
+ * Drives the umpire-spec conformance fixtures against the Kotlin implementation.
  *
- * Fixtures are downloaded from npm (@umpire/json) during the Gradle build and
- * extracted to build/conformance/. The directory is passed via the system property
- * "umpire.conformance.dir" — set automatically by the extractConformanceFixtures task.
+ * Fixtures are downloaded from GitHub releases (umpire-tools/umpire-spec) during
+ * the Gradle build, SHA-256 verified, and extracted to build/conformance/. The
+ * directory is passed via the system property "umpire.conformance.dir" — set
+ * automatically by the extractConformanceFixtures task.
  *
  * index.json is the discovery manifest. All paths inside it are relative to index.json
  * (i.e. relative to build/conformance/ itself).
  *
- * See packages/json/conformance/README.md in the @umpire/json package for the full
- * fixture shape and pseudocode runner spec.
+ * See spec/conformance/README.md in the umpire-spec repo for the full fixture shape
+ * and pseudocode runner spec.
  */
 class ConformanceTest : FreeSpec({
 
